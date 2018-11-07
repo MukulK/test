@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+ <meta charset="utf-8">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl"> 
+
+<table class="table table-hover table-bordered">
+ <thead>
+      <tr>
+        <th>Field1</th>
+        <th>Field2</th>
+        <th>Field3</th>
+        <th>Field4</th>
+        <th>Field5</th>
+        <th>Field6</th>
+      </tr>
+    </thead>
+  <tr ng-repeat="x in names">
+    <td>{{ x.Field1 }}</td>
+    <td>{{ x.Field2 }}</td>
+    <td>{{ x.Field3 }}</td>
+    <td>{{ x.Field4 }}</td>
+    <td>{{ x.Field5 }}</td>
+    <td>{{ x.Field6 }}</td>
+  </tr>
+</table>
+  <ul class="pagination" ng-repeat="y in pages">
+  <li><a href="#">{{ y.chunk }}</a></li>
+
+</ul>  
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+	$scope.names=[
+			{ "Field1": "Alfreds Futterkiste", "Field2": "Berlin", "Field3": "Germany","Field4": "100100", "Field5": "20%", "Field6": "Wow" },
+			{ "Field1": "Alfreds Futterkiste", "Field2": "Berlin", "Field3": "Germany","Field4": "100100", "Field5": "20%", "Field6": "Wow" },
+			{ "Field1": "Alfreds Futterkiste", "Field2": "Berlin", "Field3": "Germany","Field4": "100100", "Field5": "20%", "Field6": "Wow" },
+			{ "Field1": "Alfreds Futterkiste", "Field2": "Berlin", "Field3": "Germany","Field4": "100100", "Field5": "20%", "Field6": "Wow" },
+			{ "Field1": "Alfreds Futterkiste", "Field2": "Berlin", "Field3": "Germany","Field4": "100100", "Field5": "20%", "Field6": "Wow" },
+			];
+	$scope.pages = [{"chunk":1},{"chunk":2},{"chunk":3},{"chunk":4},{"chunk":5},{"chunk":6}];
+    /* $http.get("restCallToGetData")
+    .then(function (response) {$scope.names = response.data.records;}); */
+});
+</script>
+
+</body>
+</html>
