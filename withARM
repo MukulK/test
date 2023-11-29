@@ -1,0 +1,42 @@
+trigger:
+- main
+
+pr:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+jobs:
+- job: CreateVM
+  displayName: 'Create RHEL 8 VM in Azure'
+  steps:
+  - task: AzureResourceManagerTemplateDeployment@3
+    inputs:
+      azureSubscription: '<your_azure_service_connection>'
+      action: 'Create Or Update Resource Group'
+      resourceGroupName: 'MyResourceGroup'
+      location: 'East US'
+      templateLocation: 'Linked artifact'
+      csmFile: '$(Pipeline.Workspace)/path/to/your/arm-template.json'
+      deploymentMode: 'Incremental'
+      overrideParameters: '-adminUsername adminuser -adminPassword adminpassword123!'
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: '<your_azure_service_connection>'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        # Get public IP address
+        ipAddress=$(az vm show -d --resource-group MyResourceGroup --name MyRHEL8VM --query publicIps -o tsv)
+        echo "VM IP Address: $ipAddress"
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: '<your_azure_service_connection>'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        # Example: Run commands on the VM using SSH
+        sshpass -p adminpassword123! ssh -o StrictHostKeyChecking=no adminuser@$ipAddress 'echo Hello from Azure DevOps Pipeline'
