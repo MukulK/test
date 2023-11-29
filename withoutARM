@@ -1,0 +1,60 @@
+trigger:
+- main
+
+pr:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: CreateVM
+  displayName: 'Create RHEL 8 VM in Azure'
+  steps:
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: '<your_azure_service_connection>'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        # Set variables
+        resourceGroupName='MyResourceGroup'
+        vmName='MyRHEL8VM'
+        location='East US'
+        adminUsername='adminuser'
+        adminPassword='adminpassword123!'
+
+        # Create resource group
+        az group create --name $resourceGroupName --location $location
+
+        # Create VM
+        az vm create \
+          --resource-group $resourceGroupName \
+          --name $vmName \
+          --image 'RedHat:RHEL:8-LVM:latest' \
+          --admin-username $adminUsername \
+          --admin-password $adminPassword \
+          --authentication-type password \
+          --size Standard_DS1_v2
+
+        # Open port 22 for SSH
+        az vm open-port --resource-group $resourceGroupName --name $vmName --port 22 --priority 1001
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: '<your_azure_service_connection>'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        # Get public IP address
+        ipAddress=$(az vm show -d --resource-group $resourceGroupName --name $vmName --query publicIps -o tsv)
+        echo "VM IP Address: $ipAddress"
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: '<your_azure_service_connection>'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        # Example: Run commands on the VM using SSH
+        sshpass -p $adminPassword ssh -o StrictHostKeyChecking=no $adminUsername@$ipAddress 'echo Hello from Azure DevOps Pipeline'
